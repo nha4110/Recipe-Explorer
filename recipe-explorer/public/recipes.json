@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "title": "Chocolate Cake",
+    "description": "Delicious moist chocolate cake.",
+    "category": "Dessert",
+    "image": "https://via.placeholder.com/300x150"
+  },
+  {
+    "id": 2,
+    "title": "Vegan Salad",
+    "description": "Healthy and fresh.",
+    "category": "Vegan",
+    "image": "https://via.placeholder.com/300x150"
+  },
+  {
+    "id": 3,
+    "title": "Spaghetti Bolognese",
+    "description": "Italian-style main course.",
+    "category": "Main",
+    "image": "https://via.placeholder.com/300x150"
+  }
+]
