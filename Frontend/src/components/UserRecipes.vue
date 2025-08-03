@@ -1,6 +1,7 @@
 <!-- src/components/UserRecipes.vue -->
 <template>
   <div>
+    <!-- Tab Buttons -->
     <div class="d-flex mb-3">
       <button
         class="btn me-2"
@@ -18,27 +19,42 @@
       </button>
     </div>
 
+    <!-- Favorites Tab -->
     <div v-if="selectedTab === 'favorites'">
       <h5>My Favorite Recipes</h5>
       <div class="row">
-        <div class="col-md-4 mb-3" v-for="recipe in favorites" :key="recipe.id">
-          <RecipeCard :recipe="recipe" @select="openModal" />
+        <div
+          class="col-md-4 mb-3"
+          v-for="recipe in favorites"
+          :key="recipe.id"
+        >
+          <RecipeCard :recipe="formatRecipe(recipe)" @select="openModal" />
         </div>
       </div>
       <p v-if="favorites.length === 0">No favorite recipes found.</p>
     </div>
 
+    <!-- Created Tab -->
     <div v-if="selectedTab === 'created'">
       <h5>My Created Recipes</h5>
       <div class="row">
-        <div class="col-md-4 mb-3" v-for="recipe in created" :key="recipe.id">
-          <RecipeCard :recipe="recipe" @select="openModal" />
+        <div
+          class="col-md-4 mb-3"
+          v-for="recipe in created"
+          :key="recipe.id"
+        >
+          <RecipeCard :recipe="formatRecipe(recipe)" @select="openModal" />
         </div>
       </div>
       <p v-if="created.length === 0">You haven't created any recipes yet.</p>
     </div>
 
-    <RecipeModal v-if="selectedRecipe" :recipe="selectedRecipe" @close="selectedRecipe = null" />
+    <!-- Recipe Modal -->
+    <RecipeModal
+      v-if="selectedRecipe"
+      :recipe="formatRecipe(selectedRecipe)"
+      @close="selectedRecipe = null"
+    />
   </div>
 </template>
 
@@ -58,6 +74,14 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 
 const openModal = (recipe) => {
   selectedRecipe.value = recipe
+}
+
+// Ensure correct image path for local images
+const formatRecipe = (recipe) => {
+  if (recipe.image && !recipe.image.startsWith('http') && !recipe.image.startsWith('/assets/')) {
+    return { ...recipe, image: `/assets/${recipe.image}` }
+  }
+  return recipe
 }
 
 onMounted(async () => {

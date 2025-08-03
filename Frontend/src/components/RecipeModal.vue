@@ -1,3 +1,4 @@
+<!-- src/components/RecipeModal.vue -->
 <template>
   <div class="modal-backdrop" @click.self="$emit('close')">
     <div class="modal-content bg-white p-4 rounded shadow-lg">
@@ -15,8 +16,7 @@
         <li v-for="(step, i) in parsedSteps" :key="i">{{ step }}</li>
       </ol>
 
-      <div class="mt-4 d-flex justify-content-between flex-wrap gap-2">
-        <button class="btn btn-outline-primary" @click="handleLike">❤️ Like</button>
+      <div class="mt-4 d-flex justify-content-end flex-wrap gap-2">
         <button class="btn btn-outline-danger" @click="handleDelete">🗑 Delete</button>
         <button class="btn btn-secondary" @click="$emit('close')">Close</button>
       </div>
@@ -60,11 +60,6 @@ const parsedSteps = computed(() =>
     : props.recipe.steps || []
 )
 
-const handleLike = () => {
-  console.log('Like clicked. Future implementation goes here.')
-  // You can emit or call API later
-}
-
 const handleDelete = async () => {
   const confirmDelete = confirm('Are you sure you want to delete this recipe? This action cannot be undone.')
   if (!confirmDelete) return
@@ -72,7 +67,7 @@ const handleDelete = async () => {
   try {
     await axios.delete(`/api/recipes/${props.recipe.id}`)
     alert('Recipe deleted.')
-    emit('deleted', props.recipe.id) // Tell parent to update the list
+    emit('deleted', props.recipe.id)
     emit('close')
   } catch (err) {
     console.error('Error deleting recipe:', err)
