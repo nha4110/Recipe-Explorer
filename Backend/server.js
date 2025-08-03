@@ -1,22 +1,22 @@
-import express from 'express'
-import dotenv from 'dotenv'
-import cors from 'cors'
-import signupRoute from './routes/signup.js'
+const express = require('express');
+const dotenv = require('dotenv');
+const cors = require('cors');
+const signupRoute = require('./routes/signup');
 
-dotenv.config()
+dotenv.config();
 
-const app = express()
-const PORT = process.env.PORT || 8080
+const app = express();
+const PORT = process.env.PORT || 8080;
 
-app.use(cors())
-app.use(express.json())
+app.use(cors());
+app.use(express.json());
 
-app.use('/api/signup', signupRoute)
+app.use('/api/signup', signupRoute);
 
 app.get('/', (req, res) => {
-  res.send('API is running')
-})
+  res.send('API is running');
+});
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
+  console.log(`Server running on port ${PORT}`);
+});
