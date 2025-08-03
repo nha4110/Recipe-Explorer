@@ -49,13 +49,23 @@ function logout() {
 }
 
 async function saveNote() {
-  const res = await fetch(`http://localhost:8080/api/users/${user.value.id}/note`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ note: note.value })
-  })
-  const updated = await res.json()
-  user.value.note = updated.note
-  localStorage.setItem('user', JSON.stringify(user.value))
+  try {
+    const res = await fetch(`http://localhost:8080/api/users/${user.value.id}/note`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ note: note.value })
+    })
+
+    if (!res.ok) {
+      throw new Error('Failed to save note')
+    }
+
+    const updated = await res.json()
+    user.value.note = updated.note
+    localStorage.setItem('user', JSON.stringify(user.value))
+  } catch (err) {
+    console.error('Error saving note:', err)
+    alert('Failed to save note. Please try again.')
+  }
 }
 </script>
