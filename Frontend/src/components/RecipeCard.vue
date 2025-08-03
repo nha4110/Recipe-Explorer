@@ -1,7 +1,9 @@
 <template>
+  <!-- Optional: fix max card height overall -->
   <div
     class="card mb-3 cursor-pointer position-relative"
     @click="$emit('select', recipe)"
+    style="max-height: 350px;"
   >
     <img
       :src="imageUrl"
@@ -18,9 +20,9 @@
     >
       {{ liked ? '♥' : '♡' }}
     </button>
-    <div class="card-body">
-      <h5 class="card-title">{{ recipe.title }}</h5>
-      <p class="card-text text-muted">{{ shortDescription }}</p>
+    <div class="card-body d-flex flex-column" style="height: 130px;">
+      <h5 class="card-title mb-2">{{ recipe.title }}</h5>
+      <p class="card-text text-muted description-clamp">{{ shortDescription }}</p>
     </div>
   </div>
 </template>
@@ -41,7 +43,6 @@ const props = defineProps({
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 const liked = ref(props.isLiked)
 
-// Keep liked in sync with parent changes
 watch(() => props.isLiked, (newVal) => {
   liked.value = newVal
 })
@@ -66,7 +67,6 @@ const handleLike = async () => {
 
   try {
     if (!liked.value) {
-      // Add favorite (like)
       const response = await axios.post(
         `${API_BASE_URL}/api/favorites`,
         {
@@ -77,13 +77,11 @@ const handleLike = async () => {
       )
       if (response.status === 200 || response.status === 201) {
         liked.value = true
-        // Reload page to reflect new favorite status
         window.location.reload()
       } else {
         throw new Error(`Unexpected status: ${response.status}`)
       }
     } else {
-      // Remove favorite (unlike)
       const response = await axios.delete(
         `${API_BASE_URL}/api/favorites`,
         {
@@ -96,7 +94,6 @@ const handleLike = async () => {
       )
       if (response.status === 200) {
         liked.value = false
-        // No reload on unlike for quick revert possibility
       } else {
         throw new Error(`Unexpected status: ${response.status}`)
       }
@@ -111,5 +108,16 @@ const handleLike = async () => {
 <style scoped>
 .cursor-pointer {
   cursor: pointer;
+}
+
+/* Clamp description text to 3 lines with ellipsis */
+.description-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* limits text to 3 lines */
+  line-clamp: 3; /* standard property for compatibility */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 3.6em; /* approx 3 lines of text */
 }
 </style>
