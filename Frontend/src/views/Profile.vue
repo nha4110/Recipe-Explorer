@@ -7,14 +7,26 @@
       <button class="btn btn-danger" @click="logout">Logout</button>
     </div>
 
+    <!-- Personal Note Section -->
     <div class="mb-3">
       <label for="note" class="form-label">Personal Note</label>
-      <textarea id="note" class="form-control" rows="3" v-model="note" :disabled="loading" />
-      <button class="btn btn-primary mt-2" @click="saveNote" :disabled="loading">
+      <textarea
+        id="note"
+        class="form-control"
+        rows="3"
+        v-model="note"
+        :disabled="loading"
+      />
+      <button
+        class="btn btn-primary mt-2"
+        @click="saveNote"
+        :disabled="loading"
+      >
         {{ loading ? 'Saving...' : 'Update Note' }}
       </button>
     </div>
 
+    <!-- Tab Navigation -->
     <ul class="nav nav-tabs mb-3">
       <li class="nav-item" v-for="item in tabs" :key="item">
         <button
@@ -27,6 +39,7 @@
       </li>
     </ul>
 
+    <!-- Dynamic Component Rendering -->
     <component :is="components[tab]" :user="user" />
   </div>
 </template>
@@ -35,15 +48,17 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
+// Component imports
 import UserInfo from '@/components/UserInfo.vue'
 import UserRecipes from '@/components/UserRecipes.vue'
 import CreateRecipe from '@/components/CreateRecipe.vue'
 
+// API base URL
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 
 const router = useRouter()
 const user = ref(JSON.parse(localStorage.getItem('user')))
-const note = ref(user.value?.note || '') // Start with note from localStorage
+const note = ref(user.value?.note || '')
 const loading = ref(false)
 
 const tab = ref('User Information')
@@ -51,9 +66,10 @@ const tabs = ['User Information', 'My Recipes', 'Create Recipe']
 const components = {
   'User Information': UserInfo,
   'My Recipes': UserRecipes,
-  'Create Recipe': CreateRecipe
+  'Create Recipe': CreateRecipe,
 }
 
+// Load latest note from backend on mount
 onMounted(async () => {
   if (!user.value?.id) return
   try {
@@ -69,6 +85,7 @@ onMounted(async () => {
   }
 })
 
+// Sync note to localStorage whenever it changes
 watch(note, (newVal) => {
   if (user.value) {
     user.value.note = newVal
@@ -76,18 +93,15 @@ watch(note, (newVal) => {
   }
 })
 
+// Logout function with page reload
 function logout() {
   localStorage.removeItem('user')
-  if (!localStorage.getItem('user')) {
-    console.log('✅ User successfully removed from localStorage')
-  } else {
-    console.warn('⚠️ User still exists in localStorage after removal attempt')
-  }
   router.push('/login').then(() => {
     window.location.reload()
   })
 }
 
+// Save note to backend
 async function saveNote() {
   if (!user.value?.id) {
     alert('No user loaded')
@@ -98,7 +112,9 @@ async function saveNote() {
   try {
     const res = await fetch(`${API_BASE_URL}/api/user/${user.value.id}/note`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ note: note.value }),
     })
 
