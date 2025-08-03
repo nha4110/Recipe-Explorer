@@ -107,7 +107,7 @@ const handleLike = async () => {
 
 <style scoped>
 .cursor-pointer {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 /* Clamp description text to 3 lines with ellipsis */

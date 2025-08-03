@@ -1,92 +1,92 @@
 <template>
-  <form @submit.prevent="submitRecipe">
-    <!-- Title -->
-    <div class="mb-2">
-      <label class="form-label">Title</label>
-      <input class="form-control" v-model="title" required />
-    </div>
-
-    <!-- Description -->
-    <div class="mb-2">
-      <label class="form-label">Description</label>
-      <textarea class="form-control" v-model="description"></textarea>
-    </div>
-
-    <!-- Ingredients -->
-    <div class="mb-2">
-      <label class="form-label">Ingredients</label>
-      <textarea class="form-control" v-model="ingredients"></textarea>
-    </div>
-
-    <!-- Steps -->
-    <div class="mb-2">
-      <label class="form-label">Steps</label>
-      <textarea
-        class="form-control"
-        v-model="steps"
-        rows="7"
-        placeholder="1. Preheat the oven...\n2. Mix the ingredients...\n3. Bake for 20 minutes..."
-      ></textarea>
-      <small class="form-text text-muted">Write each step on a new line starting with a number.</small>
-    </div>
-
-    <!-- Image Option -->
-    <div class="mb-2">
-      <label class="form-label">Image Option</label>
-      <select class="form-select" v-model="imageOption">
-        <option value="default">Default Image</option>
-        <option value="online">Online Image URL</option>
-      </select>
-    </div>
-
-    <!-- Image Preview/Input -->
-    <div class="mb-3">
-      <div v-if="imageOption === 'default'">
-        <p class="text-muted">This is the default image that will be used:</p>
-        <img :src="defaultImageUrl" alt="Default" class="img-thumbnail" width="200" />
-      </div>
-
-      <div v-else-if="imageOption === 'online'">
-        <input
-          type="url"
-          class="form-control mb-2"
-          v-model="onlineImageUrl"
-          placeholder="Enter image URL"
-        />
-        <div v-if="onlineImageUrl">
-          <p class="text-muted">Preview:</p>
-          <img :src="onlineImageUrl" alt="Online Preview" class="img-thumbnail" width="200" />
+    <form @submit.prevent="submitRecipe">
+        <!-- Title -->
+        <div class="mb-2">
+            <label class="form-label">Title</label>
+            <input class="form-control" v-model="title" required />
         </div>
-      </div>
-    </div>
 
-    <!-- Terms & Confirmation -->
-    <div v-if="showTerms">
-      <div class="alert alert-warning">
-        <strong>Terms of Agreement</strong>
-        <p>
-          By submitting this recipe, you agree that:<br />
-          - Recipes that are nonsensical, plagiarized, copied from others, or violate copyright will be deleted.<br />
-          - You must be the original creator or have permission to share this recipe.<br />
-          - Recipes that contain inappropriate, offensive, or misleading content will be removed.<br />
-          - The platform reserves the right to moderate and remove any recipe at its discretion.
-        </p>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="agreeTerms" v-model="agreedTerms" />
-          <label class="form-check-label" for="agreeTerms">
-            I have read and agree to the terms and conditions.
-          </label>
+        <!-- Description -->
+        <div class="mb-2">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" v-model="description"></textarea>
         </div>
-        <button class="btn btn-success mt-2" type="button" :disabled="!agreedTerms" @click="confirmSubmit">
-          Confirm & Submit Recipe
-        </button>
-        <button class="btn btn-secondary mt-2 ms-2" type="button" @click="showTerms = false">
-          Cancel
-        </button>
-      </div>
-    </div>
-    <button v-else class="btn btn-success" type="button" @click="showTerms = true">Submit Recipe</button>
-  </form>
+
+        <!-- Ingredients -->
+        <div class="mb-2">
+            <label class="form-label">Ingredients</label>
+            <textarea class="form-control" v-model="ingredients"></textarea>
+        </div>
+
+        <!-- Steps -->
+        <div class="mb-2">
+            <label class="form-label">Steps</label>
+            <textarea
+                class="form-control"
+                v-model="steps"
+                rows="7"
+                placeholder="1. Preheat the oven...\n2. Mix the ingredients...\n3. Bake for 20 minutes..."
+            ></textarea>
+            <small class="form-text text-muted">Write each step on a new line starting with a number.</small>
+        </div>
+
+        <!-- Image Option -->
+        <div class="mb-2">
+            <label class="form-label">Image Option</label>
+            <select class="form-select" v-model="imageOption">
+                <option value="default">Default Image</option>
+                <option value="online">Online Image URL</option>
+            </select>
+        </div>
+
+        <!-- Image Preview/Input -->
+        <div class="mb-3">
+            <div v-if="imageOption === 'default'">
+                <p class="text-muted">This is the default image that will be used:</p>
+                <img src="https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?_gl=1*1ltlpoq*_ga*NTY3MDEwMjI3LjE3NTQyNDg2NTI.*_ga_8JE65Q40S6*czE3NTQyNDg2NTEkbzEkZzEkdDE3NTQyNDg2NTckajU0JGwwJGgw" alt="Default" class="img-thumbnail" width="200" />
+            </div>
+
+            <div v-else-if="imageOption === 'online'">
+                <input
+                    type="url"
+                    class="form-control mb-2"
+                    v-model="onlineImageUrl"
+                    placeholder="Enter image URL"
+                />
+                <div v-if="onlineImageUrl">
+                    <p class="text-muted">Preview:</p>
+                    <img :src="onlineImageUrl" alt="Online Preview" class="img-thumbnail" width="200" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Terms & Confirmation -->
+        <div v-if="showTerms">
+            <div class="alert alert-warning">
+                <strong>Terms of Agreement</strong>
+                <p>
+                    By submitting this recipe, you agree that:<br />
+                    - Recipes that are nonsensical, plagiarized, copied from others, or violate copyright will be deleted.<br />
+                    - You must be the original creator or have permission to share this recipe.<br />
+                    - Recipes that contain inappropriate, offensive, or misleading content will be removed.<br />
+                    - The platform reserves the right to moderate and remove any recipe at its discretion.
+                </p>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="agreeTerms" v-model="agreedTerms" />
+                    <label class="form-check-label" for="agreeTerms">
+                        I have read and agree to the terms and conditions.
+                    </label>
+                </div>
+                <button class="btn btn-success mt-2" type="button" :disabled="!agreedTerms" @click="confirmSubmit">
+                    Confirm & Submit Recipe
+                </button>
+                <button class="btn btn-secondary mt-2 ms-2" type="button" @click="showTerms = false">
+                    Cancel
+                </button>
+            </div>
+        </div>
+        <button v-else class="btn btn-success" type="button" @click="showTerms = true">Submit Recipe</button>
+    </form>
 </template>
 
 <script setup>
@@ -100,7 +100,8 @@ const ingredients = ref('')
 const steps = ref('')
 
 const imageOption = ref('default')
-const defaultImageUrl = ref('/assets/default.png')
+const defaultImageFilename = 'https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?_gl=1*1ltlpoq*_ga*NTY3MDEwMjI3LjE3NTQyNDg2NTI.*_ga_8JE65Q40S6*czE3NTQyNDg2NTEkbzEkZzEkdDE3NTQyNDg2NTckajU0JGwwJGgw'
+const defaultImagePreview = defaultImageFilename
 const onlineImageUrl = ref('')
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
@@ -120,7 +121,7 @@ async function submitRecipe() {
   let image = ''
 
   if (imageOption.value === 'default') {
-    image = defaultImageUrl.value
+    image = defaultImageFilename // Now this is the actual URL
   } else if (imageOption.value === 'online') {
     image = onlineImageUrl.value.trim()
   }
@@ -160,6 +161,7 @@ async function submitRecipe() {
   }
 }
 </script>
+
 
 <style scoped>
 img.img-thumbnail {
