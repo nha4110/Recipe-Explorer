@@ -32,21 +32,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-// Component tabs
 import UserInfo from '@/components/UserInfo.vue'
 import UserRecipes from '@/components/UserRecipes.vue'
 import CreateRecipe from '@/components/CreateRecipe.vue'
 
-// Env API base URL
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 
-// Router and state
 const router = useRouter()
 const user = ref(JSON.parse(localStorage.getItem('user')))
-const note = ref('')
+const note = ref(user.value?.note || '') // Start with note from localStorage
 const loading = ref(false)
 
 const tab = ref('User Information')
@@ -57,7 +54,7 @@ const components = {
   'Create Recipe': CreateRecipe
 }
 
-// Load existing note when component mounts
+// Load latest note from backend (on first mount)
 onMounted(async () => {
   if (!user.value?.id) return
   try {
@@ -73,13 +70,21 @@ onMounted(async () => {
   }
 })
 
+// Auto-save note to localStorage when edited
+watch(note, (newVal) => {
+  if (user.value) {
+    user.value.note = newVal
+    localStorage.setItem('user', JSON.stringify(user.value))
+  }
+})
+
 // Logout
 function logout() {
   localStorage.removeItem('user')
   router.push('/login')
 }
 
-// Update personal note
+// Save to backend only when clicking "Update Note"
 async function saveNote() {
   if (!user.value?.id) {
     alert('No user loaded')
@@ -111,3 +116,4 @@ async function saveNote() {
   }
 }
 </script>
+

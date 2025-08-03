@@ -1,12 +1,14 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { RouterView, useRouter } from 'vue-router'
+import { ref, onMounted, computed } from 'vue'
+import { RouterView, useRouter, useRoute } from 'vue-router'
 import AppFooter from './components/AppFooter.vue'
 
 const router = useRouter()
+const route = useRoute()
+
 const user = ref(null)
 const isLoggedIn = ref(false)
-const showDropdown = ref(false) // 👈 dropdown state
+const showDropdown = ref(false)
 
 onMounted(() => {
   const savedUser = localStorage.getItem('user')
@@ -32,6 +34,9 @@ function logout() {
 function toggleDropdown() {
   showDropdown.value = !showDropdown.value
 }
+
+// Computed: Check if current page is profile
+const isProfilePage = computed(() => route.name === 'Profile')
 </script>
 
 <template>
@@ -41,8 +46,8 @@ function toggleDropdown() {
       <h4 class="mb-0">Recipe Explorer</h4>
 
       <div>
-        <!-- Logged In Dropdown -->
-        <div v-if="isLoggedIn" class="position-relative">
+        <!-- Logged In Dropdown (hide on Profile page) -->
+        <div v-if="isLoggedIn && !isProfilePage" class="position-relative">
           <button
             class="btn btn-outline-secondary"
             type="button"
@@ -69,7 +74,7 @@ function toggleDropdown() {
         </div>
 
         <!-- Not Logged In Buttons -->
-        <div v-else class="d-flex gap-2">
+        <div v-else-if="!isLoggedIn" class="d-flex gap-2">
           <button class="btn btn-outline-primary" @click="router.push('/login')">Login</button>
           <button class="btn btn-primary" @click="router.push('/signup')">Sign Up</button>
         </div>
