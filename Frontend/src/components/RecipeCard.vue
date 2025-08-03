@@ -1,4 +1,3 @@
-<!-- src/components/RecipeCard.vue -->
 <template>
   <div
     class="card mb-3 cursor-pointer position-relative"
@@ -12,13 +11,12 @@
     />
     <button
       class="btn btn-sm position-absolute top-0 start-0 m-2 z-3 shadow-sm"
-      :class="liked ? 'btn-danger text-white' : 'btn-light'"
+      :class="liked ? 'btn-danger text-white' : 'btn-outline-secondary'"
       @click.stop="handleLike"
-      :disabled="liked"
       :aria-pressed="liked"
       aria-label="Like recipe"
     >
-      ❤️
+      {{ liked ? '♥' : '♡' }}
     </button>
     <div class="card-body">
       <h5 class="card-title">{{ recipe.title }}</h5>
@@ -28,16 +26,25 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import axios from 'axios'
 
 const props = defineProps({
   recipe: Object,
-  userId: Number
+  userId: Number,
+  isLiked: {
+    type: Boolean,
+    default: false
+  }
 })
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
-const liked = ref(false)
+const liked = ref(props.isLiked)
+
+// Watch prop changes to update liked state if parent changes it
+watch(() => props.isLiked, (newVal) => {
+  liked.value = newVal
+})
 
 const imageUrl = computed(() =>
   props.recipe.image?.startsWith('http')
@@ -52,10 +59,12 @@ const shortDescription = computed(() =>
 )
 
 const handleLike = async () => {
-  if (liked.value) return // Prevent duplicate likes
-
   if (!props.userId) {
     alert('User ID not provided. Please log in.')
+    return
+  }
+  if (liked.value) {
+    // Optionally allow unlike functionality here
     return
   }
 

@@ -1,16 +1,21 @@
+<!-- src/components/Home.vue -->
 <template>
   <div class="row m-4">
+    <!-- Filter Sidebar -->
     <div class="col-md-3">
-      <!-- FilterSidebar inline -->
-      <div class="mb-4">
+      <div class="mb-4 p-3 border rounded shadow-sm bg-light">
         <input
           type="text"
-          class="form-control mb-2"
+          class="form-control mb-3"
           placeholder="Search by title..."
-          :value="search"
-          @input="search = $event.target.value"
+          v-model="search"
+          aria-label="Search recipes"
         />
-        <select class="form-select" :value="category" @change="category = $event.target.value">
+        <select
+          class="form-select"
+          v-model="category"
+          aria-label="Select category"
+        >
           <option value="">All Categories</option>
           <option value="Dessert">Dessert</option>
           <option value="Main">Main</option>
@@ -19,29 +24,36 @@
       </div>
     </div>
 
+    <!-- Recipe List -->
     <div class="col-md-9">
-      <!-- RecipeList inline -->
-      <div class="row">
+      <div class="row g-3">
         <div class="col-md-4" v-for="recipe in filteredRecipes" :key="recipe.id">
-          <!-- RecipeCard inline -->
-          <div class="card mb-3">
-            <img :src="recipe.image" class="card-img-top" :alt="recipe.title">
-            <div class="card-body">
-              <h5 class="card-title">{{ recipe.title }}</h5>
-              <p class="card-text">{{ recipe.description }}</p>
-              <button class="btn btn-outline-danger" @click="toggleFavorite(recipe.id)">
-                {{ favorites.includes(recipe.id) ? '♥ Liked' : '♡ Like' }}
-              </button>
-            </div>
-          </div>
+          <RecipeCard
+            :recipe="formatRecipe(recipe)"
+            :userId="user?.id"
+            @select="openModal"
+          />
         </div>
       </div>
+
+      <p v-if="filteredRecipes.length === 0" class="text-center mt-4">
+        No recipes found.
+      </p>
     </div>
+
+    <!-- Recipe Modal -->
+    <RecipeModal
+      v-if="selectedRecipe"
+      :recipe="formatRecipe(selectedRecipe)"
+      @close="selectedRecipe = null"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import RecipeCard from '../components/RecipeCard.vue'
+import RecipeModal from '../components/RecipeModal.vue'
 import { fetchAllRecipes } from '../api/recipes'
 
 const user = ref(JSON.parse(localStorage.getItem('user')) || null)
@@ -49,28 +61,43 @@ const user = ref(JSON.parse(localStorage.getItem('user')) || null)
 const recipes = ref([])
 const search = ref('')
 const category = ref('')
-const favorites = ref(JSON.parse(localStorage.getItem('favorites')) || [])
+const selectedRecipe = ref(null)
 
+// Load all recipes on mount
 onMounted(async () => {
   try {
     recipes.value = await fetchAllRecipes()
   } catch (err) {
-    console.error('Could not load recipes', err)
+    console.error('Failed to load recipes:', err)
   }
 })
 
+// Computed filtered recipes
 const filteredRecipes = computed(() => {
-  return recipes.value.filter(r => {
+  return recipes.value.filter((r) => {
     const matchesSearch = r.title.toLowerCase().includes(search.value.toLowerCase())
-    const matchesCat = !category.value || r.category === category.value
-    return matchesSearch && matchesCat
+    const matchesCategory = !category.value || r.category === category.value
+    return matchesSearch && matchesCategory
   })
 })
 
-function toggleFavorite(id) {
-  const index = favorites.value.indexOf(id)
-  if (index > -1) favorites.value.splice(index, 1)
-  else favorites.value.push(id)
-  localStorage.setItem('favorites', JSON.stringify(favorites.value))
+const openModal = (recipe) => {
+  selectedRecipe.value = recipe
+}
+
+// Helper: fix image URLs if needed
+const formatRecipe = (recipe) => {
+  if (recipe.image && !recipe.image.startsWith('http') && !recipe.image.startsWith('/assets/')) {
+    return { ...recipe, image: `/assets/${recipe.image}` }
+  }
+  return recipe
 }
 </script>
+
+<style scoped>
+/* Add a subtle hover effect on recipe cards */
+.card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+</style>

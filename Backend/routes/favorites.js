@@ -44,5 +44,30 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: 'Failed to add favorite' })
   }
 })
+// DELETE to remove a favorite
+router.delete('/', async (req, res) => {
+  const { user_id, recipe_id } = req.body
+
+  if (!user_id || !recipe_id) {
+    return res.status(400).json({ error: 'Missing user_id or recipe_id' })
+  }
+
+  try {
+    const result = await pool.query(
+      `DELETE FROM favorites WHERE user_id = $1 AND recipe_id = $2 RETURNING *`,
+      [user_id, recipe_id]
+    )
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Favorite not found' })
+    }
+
+    res.json({ message: 'Favorite removed' })
+  } catch (err) {
+    console.error('Error deleting favorite:', err)
+    res.status(500).json({ error: 'Failed to remove favorite' })
+  }
+})
+
 
 module.exports = router
