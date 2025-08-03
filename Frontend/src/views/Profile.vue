@@ -1,4 +1,3 @@
-<!-- src/views/Profile.vue -->
 <template>
   <div class="container mt-4">
     <h3 class="text-center mb-3">User Profile</h3>
@@ -16,7 +15,13 @@
 
     <ul class="nav nav-tabs mb-3">
       <li class="nav-item" v-for="item in tabs" :key="item">
-        <button class="nav-link" :class="{ active: tab === item }" @click="tab = item">{{ item }}</button>
+        <button
+          class="nav-link"
+          :class="{ active: tab === item }"
+          @click="tab = item"
+        >
+          {{ item }}
+        </button>
       </li>
     </ul>
 
@@ -25,16 +30,22 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 
+// Load component tabs
 import UserInfo from '@/components/UserInfo.vue'
 import UserRecipes from '@/components/UserRecipes.vue'
 import CreateRecipe from '@/components/CreateRecipe.vue'
 
+// Init router
 const router = useRouter()
+
+// Get user from localStorage
 const user = ref(JSON.parse(localStorage.getItem('user')))
 const note = ref(user.value?.note || '')
+
+// Tabs
 const tab = ref('User Information')
 const tabs = ['User Information', 'My Recipes', 'Create Recipe']
 const components = {
@@ -43,29 +54,35 @@ const components = {
   'Create Recipe': CreateRecipe
 }
 
+// Logout
 function logout() {
   localStorage.removeItem('user')
   router.push('/login')
 }
 
+// Save note to backend
 async function saveNote() {
+  if (!user.value?.id) {
+    alert('No user loaded')
+    return
+  }
+
   try {
     const res = await fetch(`http://localhost:8080/api/users/${user.value.id}/note`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ note: note.value })
+      body: JSON.stringify({ note: note.value }),
     })
 
-    if (!res.ok) {
-      throw new Error('Failed to save note')
-    }
+    if (!res.ok) throw new Error('Failed to save note')
 
     const updated = await res.json()
     user.value.note = updated.note
     localStorage.setItem('user', JSON.stringify(user.value))
+    alert('Note saved successfully.')
   } catch (err) {
     console.error('Error saving note:', err)
-    alert('Failed to save note. Please try again.')
+    alert('Failed to save note.')
   }
 }
 </script>
