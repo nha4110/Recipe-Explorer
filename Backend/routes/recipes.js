@@ -64,5 +64,29 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: 'Failed to create recipe' });
   }
 });
+// GET /api/recipes/:id - Get a single recipe with creator name
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(
+      `SELECT recipes.*, users.username AS creator_name
+       FROM recipes
+       LEFT JOIN users ON recipes.created_by = users.id
+       WHERE recipes.id = $1`,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Recipe not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Error fetching recipe:', err);
+    res.status(500).json({ error: 'Failed to fetch recipe' });
+  }
+});
+
 
 module.exports = router;

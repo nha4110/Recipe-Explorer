@@ -4,6 +4,12 @@
     <div class="modal-content bg-white p-4 rounded shadow-lg">
       <img :src="imageUrl" class="img-fluid mb-3 rounded recipe-image" alt="Recipe Image" />
       <h3>{{ recipe.title }}</h3>
+
+      <!-- Show creator name if available -->
+      <p v-if="recipe.creator_name" class="text-muted fst-italic mb-3">
+        Created by: {{ recipe.creator_name }}
+      </p>
+
       <p class="text-muted">{{ recipe.description }}</p>
 
       <h5>Ingredients</h5>

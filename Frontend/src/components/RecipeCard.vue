@@ -66,7 +66,7 @@ const handleLike = async () => {
 
   try {
     if (!liked.value) {
-      // Add favorite
+      // Add favorite (like)
       const response = await axios.post(
         `${API_BASE_URL}/api/favorites`,
         {
@@ -77,11 +77,13 @@ const handleLike = async () => {
       )
       if (response.status === 200 || response.status === 201) {
         liked.value = true
+        // Reload page to reflect new favorite status
+        window.location.reload()
       } else {
         throw new Error(`Unexpected status: ${response.status}`)
       }
     } else {
-      // Remove favorite
+      // Remove favorite (unlike)
       const response = await axios.delete(
         `${API_BASE_URL}/api/favorites`,
         {
@@ -94,6 +96,7 @@ const handleLike = async () => {
       )
       if (response.status === 200) {
         liked.value = false
+        // No reload on unlike for quick revert possibility
       } else {
         throw new Error(`Unexpected status: ${response.status}`)
       }
