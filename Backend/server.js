@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const signupRoute = require('./routes/signup');
+const loginRoute = require('./routes/login'); // ✅ Import login route
 
 dotenv.config();
 
@@ -21,10 +22,13 @@ app.get('/api/signup', (req, res) => {
   res.send('Use POST to /api/signup to register');
 });
 
-// ✅ Actual POST handler
+// ✅ Signup handler
 app.use('/api/signup', signupRoute);
 
-// Base route
+// ✅ Login handler
+app.use('/api/login', loginRoute); // <-- ADDED THIS LINE
+
+// ✅ Root route
 app.get('/', (req, res) => {
   res.send('API is running');
 });

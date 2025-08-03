@@ -1,3 +1,4 @@
+<!-- Home.vue -->
 <template>
   <div class="row m-4">
     <div class="col-md-3">
@@ -18,7 +19,9 @@ import { ref, computed, onMounted } from 'vue'
 import RecipeList from '../components/RecipeList.vue'
 import FilterSidebar from '../components/FilterSidebar.vue'
 
+// Get user from localStorage (for favorite control or future use)
 const user = ref(JSON.parse(localStorage.getItem('user')) || null)
+
 const recipes = ref([])
 const search = ref('')
 const category = ref('')

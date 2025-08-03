@@ -1,12 +1,25 @@
+<!-- App.vue -->
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
 import AppFooter from './components/AppFooter.vue'
 
 const router = useRouter()
-const isLoggedIn = ref(false) // Change this to control login status
+const user = ref(null)
+
+const isLoggedIn = ref(false)
+
+onMounted(() => {
+  const savedUser = localStorage.getItem('user')
+  if (savedUser) {
+    user.value = JSON.parse(savedUser)
+    isLoggedIn.value = true
+  }
+})
 
 function logout() {
+  localStorage.removeItem('user')
+  user.value = null
   isLoggedIn.value = false
   router.push('/login')
 }
@@ -18,7 +31,6 @@ function logout() {
     <header class="navbar navbar-light bg-light px-4 py-2 d-flex justify-content-between align-items-center">
       <h4 class="mb-0">Recipe Explorer</h4>
 
-      <!-- Right Side -->
       <div>
         <!-- Logged In Dropdown -->
         <div v-if="isLoggedIn" class="dropdown">
@@ -28,7 +40,8 @@ function logout() {
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            <i class="bi bi-person-circle fs-5 me-1"></i> Account
+            <i class="bi bi-person-circle fs-5 me-1"></i>
+            {{ user?.username || 'Account' }}
           </button>
           <ul class="dropdown-menu dropdown-menu-end">
             <li><a class="dropdown-item" @click="router.push('/profile')">Profile</a></li>
