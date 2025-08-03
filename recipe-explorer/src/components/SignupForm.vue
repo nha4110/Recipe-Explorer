@@ -20,13 +20,27 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const username = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const router = useRouter()
+
+// Optional: Check if API route is working on mount
+onMounted(async () => {
+  try {
+    const test = await fetch('/api/signup')
+    if (!test.ok) {
+      console.warn('API route is not accepting GET requests as expected')
+    } else {
+      console.warn('⚠️ Your /api/signup is responding to GET. It should not.')
+    }
+  } catch (err) {
+    console.error('API route test failed:', err)
+  }
+})
 
 async function handleSignup() {
   if (password.value !== confirmPassword.value) {
@@ -44,12 +58,16 @@ async function handleSignup() {
       }),
     })
 
-    if (!res.ok) throw new Error('Signup failed')
+    const data = await res.json()
+
+    if (!res.ok) {
+      throw new Error(data.error || 'Unknown error occurred')
+    }
 
     alert('Signup successful!')
     router.push('/login')
   } catch (err) {
-    console.error(err)
+    console.error('Signup failed:', err)
     alert('Signup failed: ' + err.message)
   }
 }
