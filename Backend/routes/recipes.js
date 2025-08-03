@@ -1,27 +1,6 @@
 const express = require('express');
 const pool = require('../db');
-const multer = require('multer');
-const path = require('path');
 const router = express.Router();
-
-// Configure multer for PNG uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '..', 'uploads'));
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  },
-});
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype === 'image/png') {
-    cb(null, true);
-  } else {
-    cb(new Error('Only PNG files are allowed!'), false);
-  }
-};
-const upload = multer({ storage, fileFilter, limits: { fileSize: 2 * 1024 * 1024 } }); // 2MB limit
 
 // GET all recipes (optionally showing if favorited by user)
 router.get('/', async (req, res) => {
@@ -107,24 +86,11 @@ router.get('/user/:userId', async (req, res) => {
   }
 });
 
-// POST new recipe (with optional PNG upload)
-router.post('/', upload.single('image'), async (req, res) => {
-  // multer attaches file info on req.file, other form fields on req.body
-  const { title, description, ingredients, steps, created_by } = req.body;
-  let image = '';
+// POST new recipe
+router.post('/', async (req, res) => {
+  const { title, description, ingredients, steps, image, created_by } = req.body;
 
   try {
-    if (req.file) {
-      // Save path to uploaded PNG file
-      image = `/uploads/${req.file.filename}`;
-    } else if (req.body.image) {
-      // For default or online image URL sent as string
-      image = req.body.image;
-    } else {
-      // fallback image path
-      image = '/assets/default.png';
-    }
-
     const result = await pool.query(
       `INSERT INTO recipes (title, description, ingredients, steps, image, created_by)
        VALUES ($1, $2, $3, $4, $5, $6)
