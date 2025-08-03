@@ -1,4 +1,4 @@
--- Updated SQL: user, recipes, and favorites table
+-- Updated SQL: users, recipes, and favorites table
 DROP TABLE IF EXISTS favorites, recipes, users CASCADE;
 
 -- Users table
@@ -17,6 +17,7 @@ CREATE TABLE recipes (
   description TEXT,
   ingredients TEXT,
   steps TEXT,
+  image TEXT, -- New column to store image path or URL
   created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );

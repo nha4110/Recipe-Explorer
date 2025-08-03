@@ -1,7 +1,7 @@
 <template>
   <div class="row m-4">
     <div class="col-md-3">
-      <!-- FilterSidebar inline -->
+      <!-- FilterSidebar -->
       <div class="mb-4">
         <input
           type="text"
@@ -20,10 +20,10 @@
     </div>
 
     <div class="col-md-9">
-      <!-- RecipeList inline -->
+      <!-- RecipeList -->
       <div class="row">
         <div class="col-md-4" v-for="recipe in filteredRecipes" :key="recipe.id">
-          <!-- RecipeCard inline -->
+          <!-- RecipeCard -->
           <div class="card mb-3">
             <img :src="recipe.image" class="card-img-top" :alt="recipe.title">
             <div class="card-body">
@@ -42,23 +42,24 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { fetchAllRecipes } from '../api/recipes'
 
+// Local user for future use
 const user = ref(JSON.parse(localStorage.getItem('user')) || null)
 
+// States
 const recipes = ref([])
 const search = ref('')
 const category = ref('')
 const favorites = ref(JSON.parse(localStorage.getItem('favorites')) || [])
 
-onMounted(async () => {
-  try {
-    recipes.value = await fetchAllRecipes()
-  } catch (err) {
-    console.error('Could not load recipes', err)
-  }
+// Load recipe data
+onMounted(() => {
+  fetch('/recipes.json')
+    .then(res => res.json())
+    .then(data => recipes.value = data)
 })
 
+// Filtered recipes logic
 const filteredRecipes = computed(() => {
   return recipes.value.filter(r => {
     const matchesSearch = r.title.toLowerCase().includes(search.value.toLowerCase())
@@ -67,6 +68,7 @@ const filteredRecipes = computed(() => {
   })
 })
 
+// Favorite toggle
 function toggleFavorite(id) {
   const index = favorites.value.indexOf(id)
   if (index > -1) favorites.value.splice(index, 1)

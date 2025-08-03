@@ -35,7 +35,6 @@ function toggleDropdown() {
   showDropdown.value = !showDropdown.value
 }
 
-// Computed: Check if current page is profile
 const isProfilePage = computed(() => route.name === 'Profile')
 </script>
 
@@ -43,10 +42,10 @@ const isProfilePage = computed(() => route.name === 'Profile')
   <div class="d-flex flex-column min-vh-100">
     <!-- Header -->
     <header class="navbar navbar-light bg-light px-4 py-2 d-flex justify-content-between align-items-center">
-      <h4 class="mb-0">Recipe Explorer</h4>
+    <h4 class="mb-0" style="cursor: pointer;" @click="router.push('/')">Recipe Explorer</h4>
 
       <div>
-        <!-- Logged In Dropdown (hide on Profile page) -->
+        <!-- Logged In Dropdown -->
         <div v-if="isLoggedIn && !isProfilePage" class="position-relative">
           <button
             class="btn btn-outline-secondary"
@@ -58,22 +57,20 @@ const isProfilePage = computed(() => route.name === 'Profile')
           </button>
 
           <!-- Custom Dropdown Menu -->
-          <ul
+          <div
             v-if="showDropdown"
-            class="dropdown-menu dropdown-menu-end show position-absolute mt-2"
-            style="right: 0;"
+            class="dropdown-menu-custom position-absolute mt-2"
           >
-            <li>
-              <a class="dropdown-item" @click="router.push('/profile'); showDropdown = false">Profile</a>
-            </li>
-            <li><hr class="dropdown-divider" /></li>
-            <li>
-              <a class="dropdown-item" @click="logout">Logout</a>
-            </li>
-          </ul>
+            <div class="dropdown-item-custom" @click="router.push('/profile'); showDropdown = false">
+              Profile
+            </div>
+            <div class="dropdown-item-custom" @click="logout">
+              Logout
+            </div>
+          </div>
         </div>
 
-        <!-- Not Logged In Buttons -->
+        <!-- Not Logged In -->
         <div v-else-if="!isLoggedIn" class="d-flex gap-2">
           <button class="btn btn-outline-primary" @click="router.push('/login')">Login</button>
           <button class="btn btn-primary" @click="router.push('/signup')">Sign Up</button>
@@ -81,7 +78,7 @@ const isProfilePage = computed(() => route.name === 'Profile')
       </div>
     </header>
 
-    <!-- Main View -->
+    <!-- Main -->
     <main class="container flex-grow-1 my-4">
       <RouterView />
     </main>
@@ -92,7 +89,25 @@ const isProfilePage = computed(() => route.name === 'Profile')
 </template>
 
 <style scoped>
-.navbar h4 {
-  font-weight: bold;
+.dropdown-menu-custom {
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 0.5rem 0;
+  min-width: 140px;
+}
+
+.dropdown-item-custom {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-item-custom:hover {
+  background-color: #f8f9fa;
 }
 </style>
