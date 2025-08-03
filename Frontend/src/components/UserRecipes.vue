@@ -28,7 +28,11 @@
           v-for="recipe in favorites"
           :key="recipe.id"
         >
-          <RecipeCard :recipe="formatRecipe(recipe)" @select="openModal" />
+          <RecipeCard
+            :recipe="formatRecipe(recipe)"
+            :userId="user.id"
+            @select="openModal"
+          />
         </div>
       </div>
       <p v-if="favorites.length === 0">No favorite recipes found.</p>
@@ -43,7 +47,11 @@
           v-for="recipe in created"
           :key="recipe.id"
         >
-          <RecipeCard :recipe="formatRecipe(recipe)" @select="openModal" />
+          <RecipeCard
+            :recipe="formatRecipe(recipe)"
+            :userId="user.id"
+            @select="openModal"
+          />
         </div>
       </div>
       <p v-if="created.length === 0">You haven't created any recipes yet.</p>
@@ -76,10 +84,17 @@ const openModal = (recipe) => {
   selectedRecipe.value = recipe
 }
 
-// Ensure correct image path for local images
+// Helper to prefix local image paths with /assets/
 const formatRecipe = (recipe) => {
-  if (recipe.image && !recipe.image.startsWith('http') && !recipe.image.startsWith('/assets/')) {
-    return { ...recipe, image: `/assets/${recipe.image}` }
+  if (
+    recipe.image &&
+    !recipe.image.startsWith('http') &&
+    !recipe.image.startsWith('/assets/')
+  ) {
+    return {
+      ...recipe,
+      image: `/assets/${recipe.image}`
+    }
   }
   return recipe
 }

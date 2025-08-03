@@ -1,6 +1,9 @@
 <!-- src/components/RecipeCard.vue -->
 <template>
-  <div class="card mb-3 cursor-pointer position-relative" @click="$emit('select', recipe)">
+  <div
+    class="card mb-3 cursor-pointer position-relative"
+    @click="$emit('select', recipe)"
+  >
     <img
       :src="imageUrl"
       class="card-img-top"
@@ -11,6 +14,9 @@
       class="btn btn-sm position-absolute top-0 start-0 m-2 z-3 shadow-sm"
       :class="liked ? 'btn-danger text-white' : 'btn-light'"
       @click.stop="handleLike"
+      :disabled="liked"
+      :aria-pressed="liked"
+      aria-label="Like recipe"
     >
       ❤️
     </button>
@@ -46,7 +52,12 @@ const shortDescription = computed(() =>
 )
 
 const handleLike = async () => {
-  if (liked.value) return // Prevent duplicate like
+  if (liked.value) return // Prevent duplicate likes
+
+  if (!props.userId) {
+    alert('User ID not provided. Please log in.')
+    return
+  }
 
   try {
     const response = await axios.post(
@@ -61,11 +72,10 @@ const handleLike = async () => {
         }
       }
     )
-
     if (response.status === 200 || response.status === 201) {
       liked.value = true
     } else {
-      throw new Error('Unexpected response status: ' + response.status)
+      throw new Error(`Unexpected status: ${response.status}`)
     }
   } catch (err) {
     console.error('Error adding to favorites:', err)

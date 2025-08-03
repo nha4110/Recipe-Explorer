@@ -22,6 +22,8 @@ router.get('/:userId', async (req, res) => {
 
 // POST to add a favorite
 router.post('/', async (req, res) => {
+  console.log('POST /api/favorites body:', req.body) // debug log
+
   const { user_id, recipe_id } = req.body
 
   if (!user_id || !recipe_id) {
@@ -36,7 +38,6 @@ router.post('/', async (req, res) => {
        RETURNING *`,
       [user_id, recipe_id]
     )
-
     res.json(result.rows[0] || { message: 'Already favorited' })
   } catch (err) {
     console.error('Error inserting favorite:', err)

@@ -17,24 +17,23 @@ const PORT = process.env.PORT || 8080;
 app.use(cors());
 app.use(express.json());
 
-// ✅ Health check
+// Health check
 app.get('/api', (req, res) => {
   res.send('API is live at /api');
 });
 
-// ✅ Info routes
+// Info routes
 app.get('/api/signup', (req, res) => {
   res.send('Use POST to /api/signup to register');
 });
 
-// ✅ Mounting all route handlers
+// Mount route handlers
 app.use('/api/signup', signupRoute);
 app.use('/api/login', loginRoute);
-app.use('/api/user', userRoute);        // includes PATCH /:id/note
+app.use('/api/user', userRoute);
 app.use('/api/recipes', recipesRoute);
 app.use('/api/favorites', favoritesRoute);
 
-// ✅ Root
 app.get('/', (req, res) => {
   res.send('API is running');
 });
