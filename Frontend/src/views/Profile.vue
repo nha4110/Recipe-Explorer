@@ -9,8 +9,10 @@
 
     <div class="mb-3">
       <label for="note" class="form-label">Personal Note</label>
-      <textarea id="note" class="form-control" rows="3" v-model="note"></textarea>
-      <button class="btn btn-primary mt-2" @click="saveNote">Save Note</button>
+      <textarea id="note" class="form-control" rows="3" v-model="note" :disabled="loading" />
+      <button class="btn btn-primary mt-2" @click="saveNote" :disabled="loading">
+        {{ loading ? 'Saving...' : 'Update Note' }}
+      </button>
     </div>
 
     <ul class="nav nav-tabs mb-3">
@@ -30,22 +32,23 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
-// Load component tabs
+// Component tabs
 import UserInfo from '@/components/UserInfo.vue'
 import UserRecipes from '@/components/UserRecipes.vue'
 import CreateRecipe from '@/components/CreateRecipe.vue'
 
-// Init router
+// Env API base URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
+
+// Router and state
 const router = useRouter()
-
-// Get user from localStorage
 const user = ref(JSON.parse(localStorage.getItem('user')))
-const note = ref(user.value?.note || '')
+const note = ref('')
+const loading = ref(false)
 
-// Tabs
 const tab = ref('User Information')
 const tabs = ['User Information', 'My Recipes', 'Create Recipe']
 const components = {
@@ -54,35 +57,57 @@ const components = {
   'Create Recipe': CreateRecipe
 }
 
+// Load existing note when component mounts
+onMounted(async () => {
+  if (!user.value?.id) return
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/user/${user.value.id}`)
+    const data = await res.json()
+    if (data.note !== undefined) {
+      note.value = data.note
+      user.value.note = data.note
+      localStorage.setItem('user', JSON.stringify(user.value))
+    }
+  } catch (err) {
+    console.error('Error loading user note:', err)
+  }
+})
+
 // Logout
 function logout() {
   localStorage.removeItem('user')
   router.push('/login')
 }
 
-// Save note to backend
+// Update personal note
 async function saveNote() {
   if (!user.value?.id) {
     alert('No user loaded')
     return
   }
 
+  loading.value = true
   try {
-    const res = await fetch(`http://localhost:8080/api/users/${user.value.id}/note`, {
+    const res = await fetch(`${API_BASE_URL}/api/users/${user.value.id}/note`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ note: note.value }),
     })
 
-    if (!res.ok) throw new Error('Failed to save note')
+    if (!res.ok) {
+      const error = await res.json()
+      throw new Error(error.message || 'Failed to save note')
+    }
 
     const updated = await res.json()
     user.value.note = updated.note
     localStorage.setItem('user', JSON.stringify(user.value))
-    alert('Note saved successfully.')
+    alert('Note updated successfully.')
   } catch (err) {
     console.error('Error saving note:', err)
-    alert('Failed to save note.')
+    alert('Failed to update note: ' + err.message)
+  } finally {
+    loading.value = false
   }
 }
 </script>
