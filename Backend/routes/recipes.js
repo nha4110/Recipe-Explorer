@@ -1,28 +1,34 @@
-// D:/Git-project/Recipe-Explorer/Backend/routes/recipes.js
 const express = require('express');
 const pool = require('../db');
 const router = express.Router();
 
-// GET all recipes (with optional userId to check favorites)
+// GET all recipes (optionally showing if favorited by user)
 router.get('/', async (req, res) => {
-  const { userId } = req.query; // optional
+  const { userId } = req.query;
 
   try {
     let result;
 
     if (userId) {
       result = await pool.query(
-        `SELECT r.*, 
-                f.id IS NOT NULL AS is_favorite
+        `SELECT 
+           r.*, 
+           u.username AS creator_name,
+           f.id IS NOT NULL AS is_favorite
          FROM recipes r
-         LEFT JOIN favorites f 
-           ON r.id = f.recipe_id AND f.user_id = $1
+         LEFT JOIN users u ON r.created_by = u.id
+         LEFT JOIN favorites f ON r.id = f.recipe_id AND f.user_id = $1
          ORDER BY r.created_at DESC`,
         [userId]
       );
     } else {
       result = await pool.query(
-        'SELECT * FROM recipes ORDER BY created_at DESC'
+        `SELECT 
+           r.*, 
+           u.username AS creator_name
+         FROM recipes r
+         LEFT JOIN users u ON r.created_by = u.id
+         ORDER BY r.created_at DESC`
       );
     }
 
@@ -63,7 +69,13 @@ router.get('/user/:userId', async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT * FROM recipes WHERE created_by = $1 ORDER BY created_at DESC`,
+      `SELECT 
+         r.*, 
+         u.username AS creator_name
+       FROM recipes r
+       LEFT JOIN users u ON r.created_by = u.id
+       WHERE r.created_by = $1
+       ORDER BY r.created_at DESC`,
       [userId]
     );
 
