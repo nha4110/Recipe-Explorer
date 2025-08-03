@@ -20,27 +20,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+// Refs
 const username = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const router = useRouter()
 
-// Optional: Check if API route is working on mount
-onMounted(async () => {
-  try {
-    const test = await fetch('/api/signup')
-    if (!test.ok) {
-      console.warn('API route is not accepting GET requests as expected')
-    } else {
-      console.warn('⚠️ Your /api/signup is responding to GET. It should not.')
-    }
-  } catch (err) {
-    console.error('API route test failed:', err)
-  }
-})
+// Load API base URL from env
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 
 async function handleSignup() {
   if (password.value !== confirmPassword.value) {
@@ -49,7 +39,7 @@ async function handleSignup() {
   }
 
   try {
-    const res = await fetch('/api/signup', {
+    const res = await fetch(`${API_BASE_URL}/api/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
