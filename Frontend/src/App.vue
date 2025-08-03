@@ -1,4 +1,3 @@
-<!-- App.vue -->
 <script setup>
 import { ref, onMounted } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
@@ -6,14 +5,19 @@ import AppFooter from './components/AppFooter.vue'
 
 const router = useRouter()
 const user = ref(null)
-
 const isLoggedIn = ref(false)
+const showDropdown = ref(false) // 👈 dropdown state
 
 onMounted(() => {
   const savedUser = localStorage.getItem('user')
   if (savedUser) {
-    user.value = JSON.parse(savedUser)
-    isLoggedIn.value = true
+    try {
+      user.value = JSON.parse(savedUser)
+      isLoggedIn.value = true
+    } catch (err) {
+      console.error('Invalid localStorage user:', err)
+      localStorage.removeItem('user')
+    }
   }
 })
 
@@ -21,7 +25,12 @@ function logout() {
   localStorage.removeItem('user')
   user.value = null
   isLoggedIn.value = false
+  showDropdown.value = false
   router.push('/login')
+}
+
+function toggleDropdown() {
+  showDropdown.value = !showDropdown.value
 }
 </script>
 
@@ -33,20 +42,29 @@ function logout() {
 
       <div>
         <!-- Logged In Dropdown -->
-        <div v-if="isLoggedIn" class="dropdown">
+        <div v-if="isLoggedIn" class="position-relative">
           <button
-            class="btn btn-outline-secondary dropdown-toggle"
+            class="btn btn-outline-secondary"
             type="button"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
+            @click="toggleDropdown"
           >
             <i class="bi bi-person-circle fs-5 me-1"></i>
             {{ user?.username || 'Account' }}
           </button>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" @click="router.push('/profile')">Profile</a></li>
+
+          <!-- Custom Dropdown Menu -->
+          <ul
+            v-if="showDropdown"
+            class="dropdown-menu dropdown-menu-end show position-absolute mt-2"
+            style="right: 0;"
+          >
+            <li>
+              <a class="dropdown-item" @click="router.push('/profile'); showDropdown = false">Profile</a>
+            </li>
             <li><hr class="dropdown-divider" /></li>
-            <li><a class="dropdown-item" @click="logout">Logout</a></li>
+            <li>
+              <a class="dropdown-item" @click="logout">Logout</a>
+            </li>
           </ul>
         </div>
 

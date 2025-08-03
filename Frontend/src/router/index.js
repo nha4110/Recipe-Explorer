@@ -1,18 +1,37 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
+import Signup from '../views/Signup.vue'
 import Favorites from '../views/Favorites.vue'
-import Signup from '../views/Signup.vue' 
+import Profile from '../views/Profile.vue' // <-- ADD THIS
 
 const routes = [
-  { path: '/', name: 'Home', component: Home },
-  { path: '/login', name: 'Login', component: Login },
-  { path: '/signup', name: 'Signup', component: Signup }, 
+  {
+    path: '/',
+    name: 'Home',
+    component: Home
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login
+  },
+  {
+    path: '/signup',
+    name: 'Signup',
+    component: Signup
+  },
   {
     path: '/favorites',
     name: 'Favorites',
     component: Favorites,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: Profile,
+    meta: { requiresAuth: true } // Optional: block if not logged in
   }
 ]
 
@@ -21,10 +40,10 @@ const router = createRouter({
   routes
 })
 
-// simple auth guard (based on localStorage)
 router.beforeEach((to, from, next) => {
-  const loggedIn = !!localStorage.getItem('recipe_user')
-  if (to.meta.requiresAuth && !loggedIn) {
+  const isLoggedIn = !!localStorage.getItem('user')
+  
+  if (to.meta.requiresAuth && !isLoggedIn) {
     next({ name: 'Login' })
   } else {
     next()

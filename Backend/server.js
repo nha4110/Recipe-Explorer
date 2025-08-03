@@ -1,8 +1,13 @@
+// D:/Git-project/Recipe-Explorer/Backend/server.js
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+
 const signupRoute = require('./routes/signup');
-const loginRoute = require('./routes/login'); // ✅ Import login route
+const loginRoute = require('./routes/login');
+const userRoute = require('./routes/user');
+const recipesRoute = require('./routes/recipes');
+const favoritesRoute = require('./routes/favorites');
 
 dotenv.config();
 
@@ -12,7 +17,7 @@ const PORT = process.env.PORT || 8080;
 app.use(cors());
 app.use(express.json());
 
-// ✅ Route check - handles GET request to /api
+// ✅ Basic API check
 app.get('/api', (req, res) => {
   res.send('API is live at /api');
 });
@@ -22,11 +27,12 @@ app.get('/api/signup', (req, res) => {
   res.send('Use POST to /api/signup to register');
 });
 
-// ✅ Signup handler
+// ✅ Routes
 app.use('/api/signup', signupRoute);
-
-// ✅ Login handler
-app.use('/api/login', loginRoute); // <-- ADDED THIS LINE
+app.use('/api/login', loginRoute);
+app.use('/api/user', userRoute);
+app.use('/api/recipes', recipesRoute);
+app.use('/api/favorites', favoritesRoute);
 
 // ✅ Root route
 app.get('/', (req, res) => {
@@ -34,5 +40,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
 });
