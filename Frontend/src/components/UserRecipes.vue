@@ -1,4 +1,3 @@
-<!-- src/components/UserRecipes.vue -->
 <template>
   <div>
     <!-- Tab Buttons -->
@@ -31,6 +30,7 @@
           <RecipeCard
             :recipe="formatRecipe(recipe)"
             :userId="user.id"
+            :isLiked="true"
             @select="openModal"
           />
         </div>
@@ -50,6 +50,7 @@
           <RecipeCard
             :recipe="formatRecipe(recipe)"
             :userId="user.id"
+            :isLiked="favoriteIds.has(recipe.id)"
             @select="openModal"
           />
         </div>
@@ -67,7 +68,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import RecipeCard from './RecipeCard.vue'
 import RecipeModal from './RecipeModal.vue'
 
@@ -83,6 +84,9 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 const openModal = (recipe) => {
   selectedRecipe.value = recipe
 }
+
+// Set of favorite recipe IDs for quick lookup
+const favoriteIds = computed(() => new Set(favorites.value.map(f => f.id)))
 
 // Helper to prefix local image paths with /assets/
 const formatRecipe = (recipe) => {

@@ -41,7 +41,7 @@ const props = defineProps({
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 const liked = ref(props.isLiked)
 
-// Watch prop changes to update liked state if parent changes it
+// Keep liked in sync with parent changes
 watch(() => props.isLiked, (newVal) => {
   liked.value = newVal
 })
@@ -63,32 +63,44 @@ const handleLike = async () => {
     alert('User ID not provided. Please log in.')
     return
   }
-  if (liked.value) {
-    // Optionally allow unlike functionality here
-    return
-  }
 
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/api/favorites`,
-      {
-        user_id: props.userId,
-        recipe_id: props.recipe.id
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+    if (!liked.value) {
+      // Add favorite
+      const response = await axios.post(
+        `${API_BASE_URL}/api/favorites`,
+        {
+          user_id: props.userId,
+          recipe_id: props.recipe.id
+        },
+        { headers: { 'Content-Type': 'application/json' } }
+      )
+      if (response.status === 200 || response.status === 201) {
+        liked.value = true
+      } else {
+        throw new Error(`Unexpected status: ${response.status}`)
       }
-    )
-    if (response.status === 200 || response.status === 201) {
-      liked.value = true
     } else {
-      throw new Error(`Unexpected status: ${response.status}`)
+      // Remove favorite
+      const response = await axios.delete(
+        `${API_BASE_URL}/api/favorites`,
+        {
+          data: {
+            user_id: props.userId,
+            recipe_id: props.recipe.id
+          },
+          headers: { 'Content-Type': 'application/json' }
+        }
+      )
+      if (response.status === 200) {
+        liked.value = false
+      } else {
+        throw new Error(`Unexpected status: ${response.status}`)
+      }
     }
   } catch (err) {
-    console.error('Error adding to favorites:', err)
-    alert('Failed to add to favorites.')
+    console.error('Error updating favorites:', err)
+    alert('Failed to update favorites.')
   }
 }
 </script>

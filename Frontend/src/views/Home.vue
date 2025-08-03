@@ -1,4 +1,3 @@
-<!-- src/components/Home.vue -->
 <template>
   <div class="row m-4">
     <!-- Filter Sidebar -->
@@ -31,6 +30,7 @@
           <RecipeCard
             :recipe="formatRecipe(recipe)"
             :userId="user?.id"
+            :isLiked="favoriteIds.has(recipe.id)"
             @select="openModal"
           />
         </div>
@@ -59,16 +59,28 @@ import { fetchAllRecipes } from '../api/recipes'
 const user = ref(JSON.parse(localStorage.getItem('user')) || null)
 
 const recipes = ref([])
+const favorites = ref([])
 const search = ref('')
 const category = ref('')
 const selectedRecipe = ref(null)
 
-// Load all recipes on mount
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
+
+// Set of favorite recipe IDs for quick lookup
+const favoriteIds = computed(() => new Set(favorites.value.map(f => f.id)))
+
+// Load all recipes and favorites on mount
 onMounted(async () => {
   try {
     recipes.value = await fetchAllRecipes()
+    if (user.value?.id) {
+      const favRes = await fetch(`${API_BASE_URL}/api/favorites/${user.value.id}`)
+      favorites.value = await favRes.json()
+    }
   } catch (err) {
-    console.error('Failed to load recipes:', err)
+    console.error('Failed to load recipes or favorites:', err)
+    recipes.value = []
+    favorites.value = []
   }
 })
 
