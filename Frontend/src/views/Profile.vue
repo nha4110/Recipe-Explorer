@@ -48,12 +48,12 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-// Component imports
+// Import sub-components
 import UserInfo from '@/components/UserInfo.vue'
 import UserRecipes from '@/components/UserRecipes.vue'
 import CreateRecipe from '@/components/CreateRecipe.vue'
 
-// API base URL
+// Get backend API URL
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 
 const router = useRouter()
@@ -61,6 +61,7 @@ const user = ref(JSON.parse(localStorage.getItem('user')))
 const note = ref(user.value?.note || '')
 const loading = ref(false)
 
+// Tabs
 const tab = ref('User Information')
 const tabs = ['User Information', 'My Recipes', 'Create Recipe']
 const components = {
@@ -69,7 +70,7 @@ const components = {
   'Create Recipe': CreateRecipe,
 }
 
-// Load latest note from backend on mount
+// Load user note from backend when mounted
 onMounted(async () => {
   if (!user.value?.id) return
   try {
@@ -81,19 +82,19 @@ onMounted(async () => {
       localStorage.setItem('user', JSON.stringify(user.value))
     }
   } catch (err) {
-    console.error('Error loading user note:', err)
+    console.error('Failed to fetch user note:', err)
   }
 })
 
-// Sync note to localStorage whenever it changes
-watch(note, (newVal) => {
+// Sync note to localStorage on change
+watch(note, (val) => {
   if (user.value) {
-    user.value.note = newVal
+    user.value.note = val
     localStorage.setItem('user', JSON.stringify(user.value))
   }
 })
 
-// Logout function with page reload
+// Logout and reload full page
 function logout() {
   localStorage.removeItem('user')
   router.push('/login').then(() => {
@@ -104,7 +105,7 @@ function logout() {
 // Save note to backend
 async function saveNote() {
   if (!user.value?.id) {
-    alert('No user loaded')
+    alert('User not found.')
     return
   }
 
@@ -119,8 +120,8 @@ async function saveNote() {
     })
 
     if (!res.ok) {
-      const error = await res.json()
-      throw new Error(error.message || 'Failed to save note')
+      const err = await res.json()
+      throw new Error(err.message || 'Error saving note')
     }
 
     const updated = await res.json()
@@ -128,8 +129,8 @@ async function saveNote() {
     localStorage.setItem('user', JSON.stringify(user.value))
     alert('Note updated successfully.')
   } catch (err) {
-    console.error('Error saving note:', err)
-    alert('Failed to update note: ' + err.message)
+    console.error('Save note failed:', err)
+    alert('Failed to save note: ' + err.message)
   } finally {
     loading.value = false
   }
