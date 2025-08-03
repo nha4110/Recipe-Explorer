@@ -3,11 +3,9 @@ DROP TABLE IF EXISTS recipes, users CASCADE;
 -- Create "users" table
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
-  username TEXT NOT NULL,
-  email TEXT NOT NULL UNIQUE,
+  username TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL,
-  confirmed BOOLEAN DEFAULT false,
-  token TEXT
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 
