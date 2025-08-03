@@ -14,6 +14,22 @@ router.get('/', async (req, res) => {
   }
 });
 
+// DELETE /api/recipes/:id - Delete a recipe
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params
+
+  try {
+    const result = await pool.query('DELETE FROM recipes WHERE id = $1 RETURNING *', [id])
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Recipe not found' })
+    }
+    res.json({ message: 'Recipe deleted successfully' })
+  } catch (err) {
+    console.error('Error deleting recipe:', err)
+    res.status(500).json({ error: 'Failed to delete recipe' })
+  }
+})
+
 // GET /api/recipes/user/:userId - Get all recipes created by a user
 router.get('/user/:userId', async (req, res) => {
   const { userId } = req.params;

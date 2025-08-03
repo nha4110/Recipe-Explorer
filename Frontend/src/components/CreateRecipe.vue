@@ -20,16 +20,15 @@
 
     <!-- Steps -->
     <div class="mb-2">
-    <label class="form-label">Steps</label>
-    <textarea
+      <label class="form-label">Steps</label>
+      <textarea
         class="form-control"
         v-model="steps"
         rows="7"
         placeholder="1. Preheat the oven...\n2. Mix the ingredients...\n3. Bake for 20 minutes..."
-    ></textarea>
-    <small class="form-text text-muted">Write each step on a new line starting with a number.</small>
+      ></textarea>
+      <small class="form-text text-muted">Write each step on a new line starting with a number.</small>
     </div>
-
 
     <!-- Image Option -->
     <div class="mb-2">
@@ -73,14 +72,15 @@
       </div>
     </div>
 
+    <!-- Terms & Confirmation -->
     <div v-if="showTerms">
       <div class="alert alert-warning">
         <strong>Terms of Agreement</strong>
         <p>
-          By submitting this recipe, you agree that:<br>
-          - Recipes that are nonsensical, plagiarized, copied from others, or violate copyright will be deleted.<br>
-          - You must be the original creator or have permission to share this recipe.<br>
-          - Recipes that contain inappropriate, offensive, or misleading content will be removed.<br>
+          By submitting this recipe, you agree that:<br />
+          - Recipes that are nonsensical, plagiarized, copied from others, or violate copyright will be deleted.<br />
+          - You must be the original creator or have permission to share this recipe.<br />
+          - Recipes that contain inappropriate, offensive, or misleading content will be removed.<br />
           - The platform reserves the right to moderate and remove any recipe at its discretion.
         </p>
         <div class="form-check">
@@ -112,7 +112,7 @@ const ingredients = ref('')
 const steps = ref('')
 
 const imageOption = ref('default')
-const defaultImageUrl = ref('https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?_gl=1*1ltlpoq*_ga*NTY3MDEwMjI3LjE3NTQyNDg2NTI.*_ga_8JE65Q40S6*czE3NTQyNDg2NTEkbzEkZzEkdDE3NTQyNDg2NTckajU0JGwwJGgw')
+const defaultImageUrl = ref('/assets/default.png') // ← Correct relative path from `public`
 const onlineImageUrl = ref('')
 const uploadedFile = ref(null)
 const uploadedPreview = ref(null)
@@ -136,6 +136,14 @@ function handleFileUpload(event) {
     uploadedPreview.value = reader.result
   }
   reader.readAsDataURL(file)
+}
+
+function confirmSubmit() {
+  if (!agreedTerms.value) {
+    alert('Please agree to the terms before submitting.')
+    return
+  }
+  submitRecipe()
 }
 
 async function submitRecipe() {
@@ -181,6 +189,8 @@ async function submitRecipe() {
     onlineImageUrl.value = ''
     uploadedFile.value = null
     uploadedPreview.value = null
+    showTerms.value = false
+    agreedTerms.value = false
   } catch (err) {
     console.error('Error submitting recipe:', err)
     alert('Failed to submit recipe: ' + err.message)
