@@ -1,7 +1,7 @@
-// D:/Git-project/Recipe-Explorer/Backend/server.js
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const path = require('path');
 
 const signupRoute = require('./routes/signup');
 const loginRoute = require('./routes/login');
@@ -15,7 +15,12 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 app.use(cors());
+
+// Parse JSON bodies for other routes (we'll handle multipart separately)
 app.use(express.json());
+
+// Serve uploaded files statically
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Health check
 app.get('/api', (req, res) => {

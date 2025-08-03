@@ -1,34 +1,6 @@
 <template>
-  <form @submit.prevent="submitRecipe">
-    <!-- Title -->
-    <div class="mb-2">
-      <label class="form-label">Title</label>
-      <input class="form-control" v-model="title" required />
-    </div>
-
-    <!-- Description -->
-    <div class="mb-2">
-      <label class="form-label">Description</label>
-      <textarea class="form-control" v-model="description"></textarea>
-    </div>
-
-    <!-- Ingredients -->
-    <div class="mb-2">
-      <label class="form-label">Ingredients</label>
-      <textarea class="form-control" v-model="ingredients"></textarea>
-    </div>
-
-    <!-- Steps -->
-    <div class="mb-2">
-      <label class="form-label">Steps</label>
-      <textarea
-        class="form-control"
-        v-model="steps"
-        rows="7"
-        placeholder="1. Preheat the oven...\n2. Mix the ingredients...\n3. Bake for 20 minutes..."
-      ></textarea>
-      <small class="form-text text-muted">Write each step on a new line starting with a number.</small>
-    </div>
+  <form @submit.prevent="submitRecipe" enctype="multipart/form-data">
+    <!-- ... your form fields ... -->
 
     <!-- Image Option -->
     <div class="mb-2">
@@ -73,31 +45,8 @@
     </div>
 
     <!-- Terms & Confirmation -->
-    <div v-if="showTerms">
-      <div class="alert alert-warning">
-        <strong>Terms of Agreement</strong>
-        <p>
-          By submitting this recipe, you agree that:<br />
-          - Recipes that are nonsensical, plagiarized, copied from others, or violate copyright will be deleted.<br />
-          - You must be the original creator or have permission to share this recipe.<br />
-          - Recipes that contain inappropriate, offensive, or misleading content will be removed.<br />
-          - The platform reserves the right to moderate and remove any recipe at its discretion.
-        </p>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="agreeTerms" v-model="agreedTerms" />
-          <label class="form-check-label" for="agreeTerms">
-            I have read and agree to the terms and conditions.
-          </label>
-        </div>
-        <button class="btn btn-success mt-2" type="button" :disabled="!agreedTerms" @click="confirmSubmit">
-          Confirm & Submit Recipe
-        </button>
-        <button class="btn btn-secondary mt-2 ms-2" type="button" @click="showTerms = false">
-          Cancel
-        </button>
-      </div>
-    </div>
-    <button v-else class="btn btn-success" type="button" @click="showTerms = true">Submit Recipe</button>
+    <!-- ... your terms modal ... -->
+
   </form>
 </template>
 
@@ -112,7 +61,7 @@ const ingredients = ref('')
 const steps = ref('')
 
 const imageOption = ref('default')
-const defaultImageUrl = ref('/assets/default.png') // ← Correct relative path from `public`
+const defaultImageUrl = ref('/assets/default.png')
 const onlineImageUrl = ref('')
 const uploadedFile = ref(null)
 const uploadedPreview = ref(null)
@@ -147,32 +96,35 @@ function confirmSubmit() {
 }
 
 async function submitRecipe() {
-  let image = ''
+  if (!props.user?.id) {
+    alert('No user logged in')
+    return
+  }
+
+  const formData = new FormData()
+  formData.append('title', title.value)
+  formData.append('description', description.value)
+  formData.append('ingredients', ingredients.value)
+  formData.append('steps', steps.value)
+  formData.append('created_by', props.user.id)
 
   if (imageOption.value === 'default') {
-    image = defaultImageUrl.value
+    formData.append('image', defaultImageUrl.value)
   } else if (imageOption.value === 'online') {
-    image = onlineImageUrl.value.trim()
+    formData.append('image', onlineImageUrl.value.trim())
   } else if (imageOption.value === 'upload') {
-    if (!uploadedPreview.value) {
+    if (!uploadedFile.value) {
       alert('Please upload a PNG image.')
       return
     }
-    image = uploadedPreview.value
+    formData.append('image', uploadedFile.value)
   }
 
   try {
     const res = await fetch(`${API_BASE_URL}/api/recipes`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        title: title.value,
-        description: description.value,
-        ingredients: ingredients.value,
-        steps: steps.value,
-        image,
-        created_by: props.user.id
-      })
+      body: formData
+      // NOTE: Do NOT set Content-Type header manually for multipart/form-data
     })
 
     if (!res.ok) {
