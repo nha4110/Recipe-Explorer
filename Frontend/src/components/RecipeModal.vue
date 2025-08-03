@@ -1,4 +1,3 @@
-<!-- src/components/RecipeModal.vue -->
 <template>
   <div class="modal-backdrop" @click.self="$emit('close')">
     <div class="modal-content bg-white p-4 rounded shadow-lg">
@@ -23,7 +22,13 @@
       </ol>
 
       <div class="mt-4 d-flex justify-content-end flex-wrap gap-2">
-        <button class="btn btn-outline-danger" @click="handleDelete">🗑 Delete</button>
+        <button
+          v-if="allowDelete"
+          class="btn btn-outline-danger"
+          @click="handleDelete"
+        >
+          🗑 Delete
+        </button>
         <button class="btn btn-secondary" @click="$emit('close')">Close</button>
       </div>
     </div>
@@ -38,6 +43,10 @@ const props = defineProps({
   recipe: {
     type: Object,
     required: true
+  },
+  allowDelete: {
+    type: Boolean,
+    default: false
   }
 })
 const emit = defineEmits(['close', 'deleted'])

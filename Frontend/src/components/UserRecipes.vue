@@ -62,7 +62,9 @@
     <RecipeModal
       v-if="selectedRecipe"
       :recipe="formatRecipe(selectedRecipe)"
+      :allowDelete="selectedTab === 'created'"
       @close="selectedRecipe = null"
+      @deleted="handleDeletedRecipe"
     />
   </div>
 </template>
@@ -83,6 +85,14 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 
 const openModal = (recipe) => {
   selectedRecipe.value = recipe
+}
+
+// Remove deleted recipe from created list and close modal if open recipe deleted
+const handleDeletedRecipe = (deletedId) => {
+  created.value = created.value.filter(r => r.id !== deletedId)
+  if (selectedRecipe.value?.id === deletedId) {
+    selectedRecipe.value = null
+  }
 }
 
 // Set of favorite recipe IDs for quick lookup

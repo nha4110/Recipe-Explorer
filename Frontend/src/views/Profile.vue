@@ -54,7 +54,6 @@ const components = {
   'Create Recipe': CreateRecipe
 }
 
-// Load latest note from backend (on first mount)
 onMounted(async () => {
   if (!user.value?.id) return
   try {
@@ -70,7 +69,6 @@ onMounted(async () => {
   }
 })
 
-// Auto-save note to localStorage when edited
 watch(note, (newVal) => {
   if (user.value) {
     user.value.note = newVal
@@ -78,13 +76,18 @@ watch(note, (newVal) => {
   }
 })
 
-// Logout
 function logout() {
   localStorage.removeItem('user')
-  router.push('/login')
+  if (!localStorage.getItem('user')) {
+    console.log('✅ User successfully removed from localStorage')
+  } else {
+    console.warn('⚠️ User still exists in localStorage after removal attempt')
+  }
+  router.push('/login').then(() => {
+    window.location.reload()
+  })
 }
 
-// Save to backend only when clicking "Update Note"
 async function saveNote() {
   if (!user.value?.id) {
     alert('No user loaded')
@@ -93,7 +96,8 @@ async function saveNote() {
 
   loading.value = true
   try {
-      const res = await fetch(`${API_BASE_URL}/api/user/${user.value.id}/note`, {      method: 'PATCH',
+    const res = await fetch(`${API_BASE_URL}/api/user/${user.value.id}/note`, {
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ note: note.value }),
     })
@@ -115,4 +119,3 @@ async function saveNote() {
   }
 }
 </script>
-
