@@ -14,18 +14,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Configure CORS options
-const corsOptions = {
-  origin: [
-    'http://localhost:5173',          // your local frontend
-    'https://your-production-frontend-url.com' // add your production frontend URL here
-  ],
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true, // if you need to send cookies/auth headers
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 
 // Health check

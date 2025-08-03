@@ -1,50 +1,46 @@
 const express = require('express');
 const pool = require('../db');
-const bcrypt = require('bcrypt');
 const router = express.Router();
 
-// PATCH /api/user/:id/password - update password
-router.patch('/:id/password', async (req, res) => {
+// ✅ GET /api/user/:id - Fetch a user by ID
+router.get('/:id', async (req, res) => {
   const { id } = req.params;
-  const { currentPassword, newPassword } = req.body;
-
-  if (!currentPassword || !newPassword) {
-    return res.status(400).json({ error: 'Current and new password are required' });
-  }
 
   try {
-    // Get user hashed password from DB
-    const userResult = await pool.query(
-      'SELECT password FROM users WHERE id = $1',
+    const result = await pool.query(
+      'SELECT id, username, note FROM users WHERE id = $1',
       [id]
     );
 
-    if (userResult.rows.length === 0) {
+    if (result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const hashedPassword = userResult.rows[0].password;
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('GET /api/user/:id error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
 
-    // Compare currentPassword with stored hash
-    const passwordMatch = await bcrypt.compare(currentPassword, hashedPassword);
+// ✅ PATCH /api/user/:id/note - Update user note
+router.patch('/:id/note', async (req, res) => {
+  const { id } = req.params;
+  const { note } = req.body;
 
-    if (!passwordMatch) {
-      return res.status(401).json({ error: 'Current password is incorrect' });
-    }
-
-    // Hash new password
-    const saltRounds = 10;
-    const newHashedPassword = await bcrypt.hash(newPassword, saltRounds);
-
-    // Update password in DB
-    await pool.query(
-      'UPDATE users SET password = $1 WHERE id = $2',
-      [newHashedPassword, id]
+  try {
+    const result = await pool.query(
+      'UPDATE users SET note = $1 WHERE id = $2 RETURNING id, username, note',
+      [note, id]
     );
 
-    res.json({ message: 'Password updated successfully' });
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json(result.rows[0]);
   } catch (err) {
-    console.error('PATCH /api/user/:id/password error:', err);
+    console.error('PATCH /api/user/:id/note error:', err);
     res.status(500).json({ error: 'Database error' });
   }
 });
