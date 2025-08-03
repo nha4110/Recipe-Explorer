@@ -35,16 +35,19 @@ async function handleLogin() {
   error.value = ''
   try {
     const res = await loginApi({ username: username.value, password: password.value })
-    
+
     // Save user to localStorage
     localStorage.setItem('user', JSON.stringify(res.user))
 
-    // Redirect to home
-    router.push('/')
+    // Redirect to home and reload the page
+    router.push('/').then(() => {
+      window.location.reload()
+    })
   } catch (err) {
     error.value = err?.response?.data?.error || err.message || 'Login failed'
   }
 }
+
 
 function goToSignup() {
   router.push('/signup')

@@ -8,14 +8,12 @@ CREATE TABLE users (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-
--- Create "recipes" table
-CREATE TABLE IF NOT EXISTS recipes (
+-- Create "recipes" table (no reference to users)
+CREATE TABLE recipes (
   id SERIAL PRIMARY KEY,
   title VARCHAR(100) NOT NULL,
   description TEXT,
   ingredients TEXT,
   steps TEXT,
-  created_by INTEGER REFERENCES users(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
