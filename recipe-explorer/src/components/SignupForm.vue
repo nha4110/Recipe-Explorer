@@ -1,3 +1,21 @@
+<template>
+  <form @submit.prevent="handleSignup">
+    <div class="mb-3">
+      <label for="username" class="form-label">Username</label>
+      <input v-model="username" type="text" id="username" class="form-control" required />
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input v-model="email" type="email" id="email" class="form-control" required />
+    </div>
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
+      <input v-model="password" type="password" id="password" class="form-control" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Sign Up</button>
+  </form>
+</template>
+
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
