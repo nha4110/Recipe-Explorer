@@ -17,45 +17,24 @@ const PORT = process.env.PORT || 8080;
 app.use(cors());
 app.use(express.json());
 
-// ✅ Basic API check
+// ✅ Health check
 app.get('/api', (req, res) => {
   res.send('API is live at /api');
 });
 
-// ✅ Signup info page
+// ✅ Info routes
 app.get('/api/signup', (req, res) => {
   res.send('Use POST to /api/signup to register');
 });
 
-// ✅ Routes
+// ✅ Mounting all route handlers
 app.use('/api/signup', signupRoute);
 app.use('/api/login', loginRoute);
-app.use('/api/user', userRoute);
+app.use('/api/user', userRoute);        // includes PATCH /:id/note
 app.use('/api/recipes', recipesRoute);
 app.use('/api/favorites', favoritesRoute);
 
-// ✅ PATCH user note (same style as /api/signup)
-const pool = require('./db');
-app.patch('/api/users/:id/note', async (req, res) => {
-  const { id } = req.params;
-  const { note } = req.body;
-
-  try {
-    const result = await pool.query(
-      'UPDATE users SET note = $1 WHERE id = $2 RETURNING id, username, note',
-      [note, id]
-    );
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error('PATCH /api/users/:id/note error:', err);
-    res.status(500).json({ error: 'Database error' });
-  }
-});
-
-// ✅ Root route
+// ✅ Root
 app.get('/', (req, res) => {
   res.send('API is running');
 });
