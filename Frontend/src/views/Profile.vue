@@ -97,10 +97,11 @@ watch(note, (val) => {
 // Logout and reload full page
 function logout() {
   localStorage.removeItem('user')
-  router.push('/login').then(() => {
+  router.push('/').then(() => {
     window.location.reload()
   })
 }
+
 
 // Save note to backend
 async function saveNote() {
