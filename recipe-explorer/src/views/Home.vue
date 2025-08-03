@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="row m-4">
     <div class="col-md-3">
       <FilterSidebar v-model:search="search" v-model:category="category" />
     </div>
@@ -18,6 +18,7 @@ import { ref, computed, onMounted } from 'vue'
 import RecipeList from '../components/RecipeList.vue'
 import FilterSidebar from '../components/FilterSidebar.vue'
 
+const user = ref(JSON.parse(localStorage.getItem('user')) || null)
 const recipes = ref([])
 const search = ref('')
 const category = ref('')

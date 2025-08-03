@@ -1,39 +1,62 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { ref } from 'vue'
+import { RouterView, useRouter } from 'vue-router'
+import AppFooter from './components/AppFooter.vue'
+
+const router = useRouter()
+const isLoggedIn = ref(false) // Change this to control login status
+
+function logout() {
+  isLoggedIn.value = false
+  router.push('/login')
+}
 </script>
 
 <template>
-  <div>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
-      <a class="navbar-brand" href="#">Recipe Explorer</a>
-      <div class="collapse navbar-collapse">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <RouterLink to="/" class="nav-link">Home</RouterLink>
-          </li>
-          <li class="nav-item">
-            <RouterLink to="/login" class="nav-link">Login</RouterLink>
-          </li>
-          <li class="nav-item">
-            <RouterLink to="/favorites" class="nav-link">Favorites</RouterLink>
-          </li>
-        </ul>
-      </div>
-    </nav>
+  <div class="d-flex flex-column min-vh-100">
+    <!-- Header -->
+    <header class="navbar navbar-light bg-light px-4 py-2 d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">Recipe Explorer</h4>
 
-    <!-- Page content -->
-    <div class="container mt-4">
+      <!-- Right Side -->
+      <div>
+        <!-- Logged In Dropdown -->
+        <div v-if="isLoggedIn" class="dropdown">
+          <button
+            class="btn btn-outline-secondary dropdown-toggle"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <i class="bi bi-person-circle fs-5 me-1"></i> Account
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" @click="router.push('/profile')">Profile</a></li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" @click="logout">Logout</a></li>
+          </ul>
+        </div>
+
+        <!-- Not Logged In Buttons -->
+        <div v-else class="d-flex gap-2">
+          <button class="btn btn-outline-primary" @click="router.push('/login')">Login</button>
+          <button class="btn btn-primary" @click="router.push('/signup')">Sign Up</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main View -->
+    <main class="container flex-grow-1 my-4">
       <RouterView />
-    </div>
+    </main>
+
+    <!-- Footer -->
+    <AppFooter class="mt-auto" />
   </div>
 </template>
 
 <style scoped>
-.navbar-brand {
+.navbar h4 {
   font-weight: bold;
-}
-.nav-link {
-  cursor: pointer;
 }
 </style>
