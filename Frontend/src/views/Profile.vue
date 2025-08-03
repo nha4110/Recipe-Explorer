@@ -93,8 +93,7 @@ async function saveNote() {
 
   loading.value = true
   try {
-    const res = await fetch(`${API_BASE_URL}/api/users/${user.value.id}/note`, {
-      method: 'PATCH',
+      const res = await fetch(`${API_BASE_URL}/api/user/${user.value.id}/note`, {      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ note: note.value }),
     })
