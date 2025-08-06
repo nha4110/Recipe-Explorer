@@ -4,7 +4,6 @@
       <img :src="imageUrl" class="img-fluid mb-3 rounded recipe-image" alt="Recipe Image" />
       <h3>{{ recipe.title }}</h3>
 
-      <!-- Show creator name if available -->
       <p v-if="recipe.creator_name" class="text-muted fst-italic mb-3">
         Created by: {{ recipe.creator_name }}
       </p>
@@ -49,7 +48,10 @@ const props = defineProps({
     default: false
   }
 })
+
 const emit = defineEmits(['close', 'deleted'])
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081'
 
 const imageUrl = computed(() => {
   const img = props.recipe.image
@@ -80,7 +82,7 @@ const handleDelete = async () => {
   if (!confirmDelete) return
 
   try {
-    await axios.delete(`/api/recipes/${props.recipe.id}`)
+    await axios.delete(`${API_BASE_URL}/api/recipes/${props.recipe.id}`)
     alert('Recipe deleted.')
     emit('deleted', props.recipe.id)
     emit('close')

@@ -1,5 +1,4 @@
 <template>
-  <!-- Optional: fix max card height overall -->
   <div
     class="card mb-3 cursor-pointer position-relative"
     @click="$emit('select', recipe)"
@@ -21,7 +20,7 @@
       {{ liked ? '♥' : '♡' }}
     </button>
     <div class="card-body d-flex flex-column" style="height: 130px;">
-      <h5 class="card-title mb-2">{{ recipe.title }}</h5>
+      <h5 class="card-title mb-2 title-wrap">{{ recipe.title }}</h5>
       <p class="card-text text-muted description-clamp">{{ shortDescription }}</p>
     </div>
   </div>
@@ -107,17 +106,30 @@ const handleLike = async () => {
 
 <style scoped>
 .cursor-pointer {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 /* Clamp description text to 3 lines with ellipsis */
 .description-clamp {
   display: -webkit-box;
-  -webkit-line-clamp: 3; /* limits text to 3 lines */
-  line-clamp: 3; /* standard property for compatibility */
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-height: 3.6em; /* approx 3 lines of text */
+  min-height: 3.6em;
+}
+
+/* NEW: Clamp long titles to 2 lines */
+.title-wrap {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 1.1rem;
+  font-weight: 600;
+  min-height: 2.8em;
 }
 </style>
